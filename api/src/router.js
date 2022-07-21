@@ -4,7 +4,7 @@ const multer = require("multer")
 
 const router = Router()
 
-const filename = (request, filename, callback) =>{
+const filename = (request, file, callback) =>{
 callback(null, file.originalname)
 }
 
@@ -32,10 +32,12 @@ router.post('/upload', upload.single('photo'), (request, response)=>{
         return response.status(400).json({
             error: request.fileValidationError
         })
+    }else {
+        return response.status(201).json({
+            success: true
+        })
     }
-    return response.status(201).json({
-        success: true
-    })
+   
 })
 
 module.exports = router
