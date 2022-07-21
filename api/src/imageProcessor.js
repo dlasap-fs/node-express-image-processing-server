@@ -8,7 +8,7 @@ const uploadPathResolver = (filename)=>{
 return path.resolve(__dirname, '../uploads', filename)
 }
 
-const imageProcessor = (filename)=>{
+const imageProcessor = (filename) =>{
     const sourcePath = uploadPathResolver(filename)
     const resizedDestination = uploadPathResolver(`resized-${filename}`)
     const monochromeDestination = uploadPathResolver(`monochrome-${filename}`)
@@ -32,7 +32,9 @@ const imageProcessor = (filename)=>{
 
                 resizeWorker.on('message', (message)=>{
                     resizeWorkerFinished = true
-                    resolve('monochromeWorker finished processing')
+                    if(monochromeWorkerFinished){
+                        resolve('resizeWorker finished processing')
+                    }
                 })
 
                 resizeWorker.on('error', (error)=>{
@@ -40,18 +42,21 @@ const imageProcessor = (filename)=>{
                 })
 
                 resizeWorker.on('exit', (code)=>{
-                    if(code != 0){ reject(new Error('Exited with status code ' + code))}
+                    if(code !== 0){ reject(new Error('Exited with status code ' + code))}
                 })
 
                 monochromeWorker.on('message', (message)=>{
                     monochromeWorkerFinished = true
-                    resolve('resizeWorker finished processing')
+                    
+                    if(resizeWorkerFinished){
+                        resolve('monochromeWorker finished processing')
+                    }
                 })
                 monochromeWorker.on('error', (error)=>{
                     reject(new Error(error.message))
                 })
                 monochromeWorker.on('exit', (code)=>{
-                    if(code != 0){ reject(new Error('Exited with status code ' + code))}
+                    if(code !== 0){ reject(new Error('Exited with status code ' + code))}
                 })
 
               
